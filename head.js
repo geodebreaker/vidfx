@@ -9,6 +9,10 @@ log = (...a) => console.log(...a);
 start = () => { };
 loop = () => { };
 
+function gofiles(f){
+  
+}
+
 ge = {
   pic: {},
   cache: {},
