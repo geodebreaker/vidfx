@@ -1,5 +1,6 @@
 var FPS = 30;
 var vid;
+var ivid;
 var idx = 0;
 var hidx = 0;
 var frame = [];
@@ -12,41 +13,43 @@ var src = Math.floor(Math.random() * 3);
 
 function start() {
   vid = document.createElement('video');
-  vid.src = ['vid.mp4', 'vid2.mp4', 'vid5.mp4'][src];
+  vid.src = ivid || ['vid.mp4', 'vid2.mp4', 'vid5.mp4'][src];
+  /*vid.oncanplay*/ document.body.onclick = async () => {
   /*vid.oncanplay*/ document.body.onclick = async () => {
     /*vid.oncanplay*/ document.body.onclick = undefined;
-    if(input.m.x > WIDTH - 100 && input.m.y > HEIGHT - 30)
-      DESTROY = true;
-    inter = true;
-    await fetchAndExtractSamples(vid.src).then(() =>
-      playAudioSamples());
-    var can = document.createElement('canvas');
-    can.width = vid.videoWidth;
-    can.height = vid.videoHeight;
-    vid.volume = 0;
-    vid.play();
-    vid.onplay = () => {
-      vid.onplay = undefined;
-      var ctx = can.getContext('2d');
-      var i = 0;
-      var x = () => {
-        if (vid.ended) return (done = true);
-        i++;
-        ctx.drawImage(vid, 0, 0);
-        frame[i] = ctx.getImageData(0, 0, can.width, can.height);
-        idx = i;
-        setTimeout(x, 1000 / 30);
-      };
-      x();
+      if (input.m.x > WIDTH - 100 && input.m.y > HEIGHT - 30)
+        DESTROY = true;
+      inter = true;
+      await fetchAndExtractSamples(vid.src).then(() =>
+        playAudioSamples());
+      var can = document.createElement('canvas');
+      can.width = vid.videoWidth;
+      can.height = vid.videoHeight;
+      vid.volume = 0;
+      vid.play();
+      vid.onplay = () => {
+        vid.onplay = undefined;
+        var ctx = can.getContext('2d');
+        var i = 0;
+        var x = () => {
+          if (vid.ended) return (done = true);
+          i++;
+          ctx.drawImage(vid, 0, 0);
+          frame[i] = ctx.getImageData(0, 0, can.width, can.height);
+          idx = i;
+          setTimeout(x, 1000 / 30);
+        };
+        x();
+      }
     }
-  }
+  };
 }
 
 function loop(dt) {
   // if (vid.paused && inter)
   //   vid.play();
-  if (frame.length == 0)  {
-    __.text('please click', 0, 0, "white", 50)
+  if (frame.length == 0) {
+    __.text('please click', 0, 0, "white", 50);
     __.text('destroy', WIDTH - 100, HEIGHT - 30, "red", 15);
   }
   if (done) {
@@ -145,28 +148,30 @@ async function playAudioSamples() {
     .map(x => x < -db ? -db : x)
     .map(x => x * 1.2);
 
-  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  try {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-  // Create an AudioBuffer
-  const numberOfChannels = 1; // Mono audio, adjust if stereo or multi-channel
-  const bufferLength = samples.length;
-  const audioBuffer = audioContext.createBuffer(numberOfChannels, bufferLength, sampleRate);
+    // Create an AudioBuffer
+    const numberOfChannels = 1; // Mono audio, adjust if stereo or multi-channel
+    const bufferLength = samples.length;
+    const audioBuffer = audioContext.createBuffer(numberOfChannels, bufferLength, sampleRate);
 
-  // Copy the sample data into the AudioBuffer
-  const channelData = audioBuffer.getChannelData(0); // For mono audio
-  for (let i = 0; i < bufferLength; i++) {
-    channelData[i] = samples[i]; // Assuming samples are between -1 and 1
+    // Copy the sample data into the AudioBuffer
+    const channelData = audioBuffer.getChannelData(0); // For mono audio
+    for (let i = 0; i < bufferLength; i++) {
+      channelData[i] = samples[i]; // Assuming samples are between -1 and 1
+    }
+
+    // Create an AudioBufferSourceNode to play the buffer
+    const source = audioContext.createBufferSource();
+    source.buffer = audioBuffer;
+
+    // Connect the source to the AudioContext's destination
+    source.connect(audioContext.destination);
+
+    // Start playing the audio
+    source.start();
+  } catch (e) {
+    console.error(e)
   }
-
-  // Create an AudioBufferSourceNode to play the buffer
-  const source = audioContext.createBufferSource();
-  source.buffer = audioBuffer;
-
-  // Connect the source to the AudioContext's destination
-  source.connect(audioContext.destination);
-
-  // Start playing the audio
-  source.start();
 }
-
-ge.start();
