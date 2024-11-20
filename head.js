@@ -9,6 +9,13 @@ log = (...a) => console.log(...a);
 start = () => { };
 loop = () => { };
 
+async function gofile(f) {
+  ivid = URL.createObjectURL(f.files.item(0));
+  $('button').style.display = "none";
+  $('input').style.display = "none";
+  ge.start();
+}
+
 ge = {
   pic: {},
   cache: {},
