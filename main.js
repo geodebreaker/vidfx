@@ -1,5 +1,6 @@
 var FPS = 30;
 var vid;
+var ivid;
 var idx = 0;
 var hidx = 0;
 var frame = [];
@@ -12,7 +13,7 @@ var src = Math.floor(Math.random() * 3);
 
 function start() {
   vid = document.createElement('video');
-  vid.src = ['vid.mp4', 'vid2.mp4', 'vid5.mp4'][src];
+  vid.src = ivid || ['vid.mp4', 'vid2.mp4', 'vid5.mp4'][src];
   /*vid.oncanplay*/ document.body.onclick = async () => {
     /*vid.oncanplay*/ document.body.onclick = undefined;
     if(input.m.x > WIDTH - 100 && input.m.y > HEIGHT - 30)
