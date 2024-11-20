@@ -9,6 +9,10 @@
       overflow: clip;
       margin: 0;
     }
+
+    input {
+      background: white;
+    }
   </style>
   <script src="head.js" defer></script>
   <script src="main.js" defer></script>
@@ -16,8 +20,8 @@
 </head>
 
 <body>
-  <input id="f" type="file">
-  <button onclick="gofile(document.querySelector('#f'))">Go</button>
+  <input type="file" accept="video/*">
+  <button onclick="gofile($('input'))">Go</button>
   <canvas></canvas>
 </body>
 
